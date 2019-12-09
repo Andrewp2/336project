@@ -20,6 +20,9 @@ camera.position.x = -2;
 camera.position.y = 2;
 camera.lookAt(0,0,0);
 
+var controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.update();
+
 var update = () => {
 
 };
@@ -30,6 +33,7 @@ var render = () => {
 
 var loop = () => {
     requestAnimationFrame(loop);
+    controls.update();
     update();
     render();
 };
