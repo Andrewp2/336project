@@ -11,7 +11,14 @@ var material = new THREE.MeshBasicMaterial({color: 0x00FF00, wireframe: false});
 var cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
-camera.position.z = 3;
+var edges = new THREE.EdgesGeometry(geometry);
+var mesh = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color:0x000000}));
+scene.add(mesh);
+
+camera.position.z = 2;
+camera.position.x = -2;
+camera.position.y = 2;
+camera.lookAt(0,0,0);
 
 var update = () => {
 
