@@ -24,7 +24,7 @@ scene.add( ambientLight );
 var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 camera.position.set( - 500, 500, 1500 );
 
-resolution = 28;
+var resolution = 28;
 
 effect = new THREE.MarchingCubes(resolution, material, true, true);
 effect.position.set( 0, 0, 0 );
@@ -33,41 +33,11 @@ effect.enableUvs = false;
 effect.enableColors = false;
 scene.add(effect);
 
-var effectController;
-
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-effectController = {
-    material: "shiny",
-    speed: 1.0,
-    numBlobs: 0,
-    resolution: 24,
-    isolation: 80,
-    floor: false,
-    wallx: true,
-    wallz: true,
-    hue: 0.0,
-    saturation: 0.8,
-    lightness: 0.1,
-    lhue: 0.04,
-    lsaturation: 1.0,
-    llightness: 0.5,
-    lx: 0.5,
-    ly: 0.5,
-    lz: 1.0,
-    dummy: function () {}
-};
-
 var render = () => {
-	// marching cubes
-	if ( effectController.resolution !== resolution ) {
-		resolution = effectController.resolution;
-		effect.init( Math.floor( resolution ) );
-	}
-	if ( effectController.isolation !== effect.isolation ) {
-		effect.isolation = effectController.isolation;
-    }
-    updateCubes( effect, effectController.floor, effectController.wallx, effectController.wallz );
+    effect.init(resolution);
+    updateCubes( effect, true, true, true);
     renderer.render(scene,camera);
 };
 
