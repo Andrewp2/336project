@@ -3,17 +3,14 @@ var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHei
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.gammaOutput = true;
+renderer.setPixelRatio( window.devicePixelRatio );
+renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild(renderer.domElement);
 
 var geometry = new THREE.BoxGeometry( 30, 30, 30 );
 
 var material = new THREE.MeshPhongMaterial({color: 0x999999, wireframe: false});
-var cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
-
-var edges = new THREE.EdgesGeometry(geometry);
-var mesh = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color:0x000000}));
-scene.add(mesh);
 
 var light = new THREE.DirectionalLight( 0xffffff );
 light.position.set( 0.5, 0.5, 1 );
@@ -24,16 +21,16 @@ scene.add( pointLight );
 var ambientLight = new THREE.AmbientLight( 0x080808 );
 scene.add( ambientLight );
 
-camera.position.z = 100;
-camera.position.x = -100;
-camera.position.y = 100;
-camera.lookAt(0,0,0);
+var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+camera.position.set( - 500, 500, 1500 );
 
 resolution = 28;
 
 effect = new THREE.MarchingCubes(resolution, material, true, true);
-effect.position.set(0,0,0);
-effect.scale.set(100,100,100);
+effect.position.set( 0, 0, 0 );
+effect.scale.set( 700, 700, 700 );
+effect.enableUvs = false;
+effect.enableColors = false;
 scene.add(effect);
 
 var clock = new THREE.Clock();
