@@ -15,13 +15,13 @@ var edges = new THREE.EdgesGeometry(geometry);
 var mesh = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color:0x000000}));
 scene.add(mesh);
 
-light = new THREE.DirectionalLight( 0xffffff );
+var light = new THREE.DirectionalLight( 0xffffff );
 light.position.set( 0.5, 0.5, 1 );
 scene.add( light );
-pointLight = new THREE.PointLight( 0xff3300 );
+var pointLight = new THREE.PointLight( 0xff3300 );
 pointLight.position.set( 400, 500, 200 );
 scene.add( pointLight );
-ambientLight = new THREE.AmbientLight( 0x080808 );
+var ambientLight = new THREE.AmbientLight( 0x080808 );
 scene.add( ambientLight );
 
 camera.position.z = 100;
@@ -41,7 +41,6 @@ var effectController;
 var time = 0;
 
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.update();
 
 effectController = {
     material: "shiny",
@@ -64,10 +63,6 @@ effectController = {
     dummy: function () {}
 };
 
-var update = () => {
-
-};
-
 var render = () => {
     var delta = clock.getDelta();
 	time += delta * effectController.speed * 0.5;
@@ -86,7 +81,6 @@ var render = () => {
 var loop = () => {
     requestAnimationFrame(loop);
     controls.update();
-    update();
     render();
 };
 
