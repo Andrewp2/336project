@@ -8,11 +8,6 @@ renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild(renderer.domElement);
 
-var geometry = new THREE.BoxGeometry( 30, 30, 30 );
-
-var material = new THREE.MeshPhongMaterial({color: 0x112211, wireframe: false});
-
-
 var light = new THREE.DirectionalLight( 0xffffff );
 light.position.set( 0.5, 0.5, 1 );
 scene.add( light );
@@ -23,7 +18,8 @@ var ambientLight = new THREE.AmbientLight( 0x080808 );
 scene.add( ambientLight );
 
 var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100000 );
-camera.position.set( - 2000, 800, 1000 );
+camera.position.set( - 4000, -400, 1000 );
+camera.lookAt(0,0,0);
 
 var resolutionX = 100;
 var resolutionY = 15;
@@ -33,12 +29,10 @@ var resolution = resolutionX;
 
 let heightMap = generateHeight(resolution, resolution);
 
-var cubesMaterial = new THREE.Material({shininess: 2, vertexColors: THREE.VertexColors});
+var cubesMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0xffffff,shininess: 2, vertexColors: THREE.VertexColors});
 effect = new THREE.MarchingCubes(resolution, cubesMaterial, true, true);
 effect.position.set( 0, 0, 0 );
 effect.scale.set( 2000, 2000, 2000 );
-effect.enableUvs = false;
-effect.enableColors = false;
 scene.add(effect);
 
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -50,6 +44,8 @@ var clock = new THREE.Clock();
 var render = () => {
     effect.init(resolution);
     updateCubes( effect, false, false, false);
+    //effect.material.uniforms[ "uBaseColor" ].value.setHSL( .5, 1, 0.025 );
+    effect.material.color.setHSL( .5, 1, 0.025  );
     renderer.render(scene,camera);
 };
 
@@ -79,27 +75,34 @@ function generateHeight( width, height ) {
 function updateCubes( object,floor, wallx, wallz ) {
     object.reset();
 
-    var waterHeight = 5;
+    var waterHeight = 15;
     var terraceHeight = 2;
     
-    for(x = 0; x < resolution;x++) {
-        for(z = 0; z < resolution;z++) {
+    for(x = 0; x < resolution; x++) {
+        for(z = 0; z < resolution; z++) {
             for(y = 0; y < waterHeight; y++) {
                 object.setCell(x,y,z,100);
                 var index = effect.size2 * z + effect.size * y + x;
-                effect.palette[ ( index ) * 3 + 0 ] += 0;
-				effect.palette[ ( index ) * 3 + 1 ] += 0;
-				effect.palette[ ( index ) * 3 + 2 ] += 10000;
+                effect.palette[ ( index ) * 3] += 100; //this doesn't
+				effect.palette[ ( index ) * 3 + 1 ] += 5; //this works
+                effect.palette[ ( index ) * 3 + 2 ] += 10; //this works
             }
-            var height = heightMap[x*resolution + z]*.3;
+            var height = heightMap[x*resolution + z]*.25;
             //uncomment to make mountain into terrace
             //height -= height % terraceHeight
             for(y = waterHeight; y < height; y++) {
                 object.setCell(x,y,z,100);
                 var index = effect.size2 * z + effect.size * y + x;
-                effect.palette[ ( index ) * 3 + 0 ] += y;
-				effect.palette[ ( index ) * 3 + 1 ] += 0;
-				effect.palette[ ( index ) * 3 + 2 ] += 0;
+                if(y > 30) {
+                    effect.palette[ ( index ) * 3] += 10;
+				    effect.palette[ ( index ) * 3 + 1 ] += 10;
+				    effect.palette[ ( index ) * 3 + 2 ] += 10;
+                } else {
+                    effect.palette[ ( index ) * 3] += 10; //doesn't work
+				    effect.palette[ ( index ) * 3 + 1 ] += 0; //works
+				    effect.palette[ ( index ) * 3 + 2 ] += 0; //works
+                }
+            
             }
         }
     }
