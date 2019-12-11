@@ -18,8 +18,8 @@ var ambientLight = new THREE.AmbientLight( 0x080808 );
 scene.add( ambientLight );
 
 var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100000 );
-camera.position.set( - 4000, -400, 1000 );
-camera.lookAt(0,0,0);
+camera.position.set( 3000, 4000, 3000 );
+camera.lookAt(0,-1000,0);
 
 var resolutionX = 100;
 var resolutionY = 15;
@@ -29,15 +29,15 @@ var resolution = resolutionX;
 
 let heightMap = generateHeight(resolution, resolution);
 
-var cubesMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x555555,shininess: 2, vertexColors: THREE.VertexColors});
+var cubesMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x111111,shininess: 10, vertexColors: THREE.VertexColors});
 effect = new THREE.MarchingCubes(resolution, cubesMaterial, true, true);
 effect.position.set( 0, 0, 0 );
 effect.scale.set( 2000, 2000, 2000 );
 scene.add(effect);
 
-var controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.movementSpeed = 1000;
-controls.lookSpeed = 0.1;
+//var controls = new THREE.OrbitControls(camera, renderer.domElement);
+//controls.movementSpeed = 1000;
+//controls.lookSpeed = 0.1;
 
 var clock = new THREE.Clock();
 
@@ -51,7 +51,7 @@ var render = () => {
 
 var loop = () => {
     requestAnimationFrame(loop);
-    controls.update(clock.getDelta());
+    //controls.update(clock.getDelta());
     render();
 };
 
@@ -80,7 +80,8 @@ function updateCubes( object,floor, wallx, wallz ) {
     var peakHeight = 28;
 
     let waterColor = new THREE.Color(0,0,.5);
-    let groundColor = new THREE.Color(.2,.5,.1);
+    //let groundColor = new THREE.Color(.2,.5,.1);
+    let groundColor = new THREE.Color(210/256, 133/256, 63/256)
     let peakColor = new THREE.Color(.7,.7,.7);
     
     for(x = 0; x < resolution; x++) {
@@ -94,7 +95,7 @@ function updateCubes( object,floor, wallx, wallz ) {
             }
             var height = heightMap[x*resolution + z]*.25;
             //uncomment to make mountain into terrace
-            //height -= height % terraceHeight
+            height -= height % terraceHeight
             for(y = waterHeight; y < height; y++) {
                 object.setCell(x,y,z,100);
                 var index = effect.size2 * z + effect.size * y + x;
