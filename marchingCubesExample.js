@@ -29,7 +29,7 @@ var resolution = resolutionX;
 
 let heightMap = generateHeight(resolution, resolution);
 
-var cubesMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0xffffff,shininess: 2, vertexColors: THREE.VertexColors});
+var cubesMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x555555,shininess: 2, vertexColors: THREE.VertexColors});
 effect = new THREE.MarchingCubes(resolution, cubesMaterial, true, true);
 effect.position.set( 0, 0, 0 );
 effect.scale.set( 2000, 2000, 2000 );
@@ -45,7 +45,7 @@ var render = () => {
     effect.init(resolution);
     updateCubes( effect, false, false, false);
     //effect.material.uniforms[ "uBaseColor" ].value.setHSL( .5, 1, 0.025 );
-    effect.material.color.setHSL( .5, 1, 0.025  );
+    //effect.material.color.setHSL( .5, 1, 0.025  );
     renderer.render(scene,camera);
 };
 
@@ -75,7 +75,7 @@ function generateHeight( width, height ) {
 function updateCubes( object,floor, wallx, wallz ) {
     object.reset();
 
-    var waterHeight = 15;
+    var waterHeight = 13;
     var terraceHeight = 2;
     
     for(x = 0; x < resolution; x++) {
@@ -83,7 +83,7 @@ function updateCubes( object,floor, wallx, wallz ) {
             for(y = 0; y < waterHeight; y++) {
                 object.setCell(x,y,z,100);
                 var index = effect.size2 * z + effect.size * y + x;
-                effect.palette[ ( index ) * 3] += 100; //this doesn't
+                effect.palette[ ( index ) * 3] += 0; //this doesn't
 				effect.palette[ ( index ) * 3 + 1 ] += 5; //this works
                 effect.palette[ ( index ) * 3 + 2 ] += 10; //this works
             }
@@ -93,14 +93,14 @@ function updateCubes( object,floor, wallx, wallz ) {
             for(y = waterHeight; y < height; y++) {
                 object.setCell(x,y,z,100);
                 var index = effect.size2 * z + effect.size * y + x;
-                if(y > 30) {
-                    effect.palette[ ( index ) * 3] += 10;
-				    effect.palette[ ( index ) * 3 + 1 ] += 10;
-				    effect.palette[ ( index ) * 3 + 2 ] += 10;
+                if(y > 25) {
+                    effect.palette[ ( index ) * 3] += 1; //can't make things red
+				    effect.palette[ ( index ) * 3 + 1 ] += 0;
+				    effect.palette[ ( index ) * 3 + 2 ] += 0;
                 } else {
-                    effect.palette[ ( index ) * 3] += 10; //doesn't work
-				    effect.palette[ ( index ) * 3 + 1 ] += 0; //works
-				    effect.palette[ ( index ) * 3 + 2 ] += 0; //works
+                    effect.palette[ ( index ) * 3] += 0; //doesn't work
+				    effect.palette[ ( index ) * 3 + 1 ] += 5; //works
+                    effect.palette[ ( index ) * 3 + 2 ] += 0; //works
                 }
             
             }
