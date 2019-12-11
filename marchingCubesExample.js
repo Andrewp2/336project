@@ -77,15 +77,20 @@ function updateCubes( object,floor, wallx, wallz ) {
 
     var waterHeight = 13;
     var terraceHeight = 2;
+    var peakHeight = 28;
+
+    let waterColor = new THREE.Color(0,0,.5);
+    let groundColor = new THREE.Color(.2,.5,.1);
+    let peakColor = new THREE.Color(.7,.7,.7);
     
     for(x = 0; x < resolution; x++) {
         for(z = 0; z < resolution; z++) {
             for(y = 0; y < waterHeight; y++) {
                 object.setCell(x,y,z,100);
                 var index = effect.size2 * z + effect.size * y + x;
-                effect.palette[ ( index ) * 3] += 0; //this doesn't
-				effect.palette[ ( index ) * 3 + 1 ] += 5; //this works
-                effect.palette[ ( index ) * 3 + 2 ] += 10; //this works
+                effect.palette[ ( index ) * 3] += waterColor.r;
+				effect.palette[ ( index ) * 3 + 1 ] += waterColor.g;
+                effect.palette[ ( index ) * 3 + 2 ] += waterColor.b;
             }
             var height = heightMap[x*resolution + z]*.25;
             //uncomment to make mountain into terrace
@@ -93,14 +98,14 @@ function updateCubes( object,floor, wallx, wallz ) {
             for(y = waterHeight; y < height; y++) {
                 object.setCell(x,y,z,100);
                 var index = effect.size2 * z + effect.size * y + x;
-                if(y > 25) {
-                    effect.palette[ ( index ) * 3] += 1; //can't make things red
-				    effect.palette[ ( index ) * 3 + 1 ] += 0;
-				    effect.palette[ ( index ) * 3 + 2 ] += 0;
+                if(y > peakHeight) {
+                    effect.palette[ ( index ) * 3] += peakColor.r;
+				    effect.palette[ ( index ) * 3 + 1 ] += peakColor.g;
+				    effect.palette[ ( index ) * 3 + 2 ] += peakColor.b;
                 } else {
-                    effect.palette[ ( index ) * 3] += 0; //doesn't work
-				    effect.palette[ ( index ) * 3 + 1 ] += 5; //works
-                    effect.palette[ ( index ) * 3 + 2 ] += 0; //works
+                    effect.palette[ ( index ) * 3] += groundColor.r;
+				    effect.palette[ ( index ) * 3 + 1 ] += groundColor.g;
+                    effect.palette[ ( index ) * 3 + 2 ] += groundColor.b;
                 }
             
             }
