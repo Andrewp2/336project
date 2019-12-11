@@ -35,9 +35,9 @@ effect.position.set( 0, 0, 0 );
 effect.scale.set( 2000, 2000, 2000 );
 scene.add(effect);
 
-//var controls = new THREE.OrbitControls(camera, renderer.domElement);
-//controls.movementSpeed = 1000;
-//controls.lookSpeed = 0.1;
+var controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.movementSpeed = 1000;
+controls.lookSpeed = 0.1;
 
 var clock = new THREE.Clock();
 
@@ -51,7 +51,7 @@ var render = () => {
 
 var loop = () => {
     requestAnimationFrame(loop);
-    //controls.update(clock.getDelta());
+    controls.update(clock.getDelta());
     render();
 };
 
