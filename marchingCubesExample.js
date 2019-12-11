@@ -79,7 +79,7 @@ var render = () => {
 
 var loop = () => {
     requestAnimationFrame(loop);
-    controls.update(clock.getDelta());
+    controls.update();
     render();
 };
 
