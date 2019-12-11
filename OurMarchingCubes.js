@@ -40,7 +40,39 @@ THREE.MarchingCubes = function ( resolutionX, resolutionY, resolutionZ) {
 	};
 
     function polygonize(gridcube, isolation) {
-        
+        var i = 0
+        var ntri = 0
+        var vertList = new Float32Array([-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0,])
+
+        cubeIndex = 0
+        if(gridcube.val[0] < isolation) {
+            cubeIndex |= 1;
+        }
+        if(gridcube.val[1] < isolation) {
+            cubeIndex |= 2;
+        }
+        if(gridcube.val[2] < isolation) {
+            cubeIndex |= 4;
+        }
+        if(gridcube.val[3] < isolation) {
+            cubeIndex |= 8;
+        }
+        if(gridcube.val[4] < isolation) {
+            cubeIndex |= 16;
+        }
+        if(gridcube.val[5] < isolation) {
+            cubeIndex |= 32;
+        }
+        if(gridcube.val[6] < isolation) {
+            cubeIndex |= 64;
+        }
+        if(gridcube.val[7] < isolation) {
+            cubeIndex |= 128;
+        }
+        //nothing to draw
+        if(edgeTable[cubeIndex] === 0) {
+            return vertList;
+        }
     }
 
     function VertexInterpolation(isolation, point1, point2, valuePoint1, valuePoint2) {

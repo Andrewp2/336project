@@ -24,11 +24,13 @@ scene.add( ambientLight );
 var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100000 );
 camera.position.set( - 500, 7000, 1500 );
 
-var resolutionX = 30;
+var resolutionX = 120;
 var resolutionY = 15;
 var resolutionZ = 30;
 
-effect = new THREE.MarchingCubes(resolutionX, resolutionY, resolutionZ, material);
+var resolution = resolutionX;
+
+effect = new THREE.MarchingCubes(resolution, material, true, true);
 effect.position.set( 0, 0, 0 );
 effect.scale.set( 7000, 3000, 7000 );
 effect.enableUvs = false;
@@ -38,11 +40,8 @@ scene.add(effect);
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 var render = () => {
-    effect.init(resolutionX, resolutionY, resolutionZ);
-    floor = false
-    wallx = false
-    wallz = false
-    updateCubes( effect, floor, wallx, wallz);
+    effect.init(resolution);
+    updateCubes( effect, true, false, false);
     renderer.render(scene,camera);
 };
 
@@ -54,12 +53,12 @@ var loop = () => {
 
 function updateCubes( object,floor, wallx, wallz ) {
     object.reset();
-    //console.log(object.field.length);
+    console.log(object.field.length);
     for(x = 12; x < 16;x++) {
-        for(y = 8; y < 12; y++) {
+        for(y = 12; y < 16; y++) {
             for(z = 1; z< 24; z++) {
                 //console.log("Setting cell at " + x + " " + y + " " + z);
-                object.setCell(x,y,z,150000000.0);
+                object.setCell(x,y,z,1500000000000.0);
             }
         }
     }
