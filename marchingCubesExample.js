@@ -63,7 +63,7 @@ function main() {
     heightMap = generateHeight(resolution, resolution);
 
     cubesMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x111111,shininess: 10, vertexColors: THREE.VertexColors});
-    effect = new THREE.MarchingCubes(resolution, cubesMaterial, true, true);
+    effect = new THREE.MarchingCubes(resolution, cubesMaterial, false, true);
     effect.position.set( 0, 0, 0);
     effect.scale.set( 2000, 2000, 2000 );
     scene.add(effect);

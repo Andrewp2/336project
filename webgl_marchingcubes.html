@@ -69,7 +69,7 @@
 			scene.add( pointLight );
 
 			var geometry = new THREE.BoxGeometry(50,50,50);
-			var material = new THREE.MeshBasicMaterial({color:0x00ff00});
+			var material = new THREE.MeshBasicMaterial({color:0x00fff0});
 			var cube = new THREE.Mesh(geometry, material);
 			cube.position.y = 150;
 			scene.add(cube);
@@ -86,7 +86,7 @@
 			// MATERIALS
 
 			materials = generateMaterials();
-			current_material = "chrome";
+			current_material = "colors";
 
 			// MARCHING CUBES
 
@@ -189,7 +189,7 @@
 					m: new THREE.MeshLambertMaterial( { color: 0x000000, flatShading: true } ),
 					h: 0, s: 0, l: 1
 				},
-
+				
 				"textured": {
 					m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1} ),
 					h: 0, s: 0, l: 1
@@ -265,7 +265,7 @@
 
 			effectController = {
 
-				material: "chrome",
+				material: "colors",
 
 				speed: 1.0,
 				numBlobs: 0,
