@@ -67,6 +67,7 @@ function main() {
     controls.lookSpeed = 0.1;
 
     clock = new THREE.Clock();
+    loop();
 }
 
 var render = () => {
@@ -145,5 +146,3 @@ function updateCubes( object,floor, wallx, wallz ) {
     if ( wallz ) object.addPlaneZ( 2, 12 );
     if ( wallx ) object.addPlaneX( 2, 12 );
 }
-
-loop();
