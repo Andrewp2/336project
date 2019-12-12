@@ -5,14 +5,16 @@ var light;
 var pointLight;
 var ambientLight;
 var camera;
-var resolutionX;
-var resolutionY;
-var resolutionZ;
-var resolution;
 let heightMap;
 var cubesMaterial;
 var controls;
 var clock;
+
+let chunkGridSize = 3;
+let chunkGridSize2 = chunkGridSize * chunkGridSize;
+let resolution = 50;
+
+var chunks;
 
 function main() {
     scene = new THREE.Scene();
@@ -26,19 +28,6 @@ function main() {
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild(renderer.domElement);
-    
-
-    var geometry = new THREE.BoxGeometry(300,300,300);
-    var material = new THREE.MeshBasicMaterial({color:0x00ff00});
-    var cube = new THREE.Mesh(geometry, material);
-    cube.position.y = 150;
-    scene.add(cube);
-
-    var geometry1 = new THREE.BoxGeometry(300,300,300);
-    var material1 = new THREE.MeshBasicMaterial({color:0x00ff00});
-    var cube1 = new THREE.Mesh(geometry1, material1);
-    cube1.position.y = 800;
-    scene.add(cube1);
 
     light = new THREE.DirectionalLight( 0xffffff );
     light.position.set( 0.5, 0.5, 1 );
@@ -54,19 +43,27 @@ function main() {
     camera.position.set(4000,4000,4000 );
     camera.lookAt(0,0,0);
 
-    resolutionX = 100;
-    resolutionY = 15;
-    resolutionZ = 30;
+    heightMap = generateHeight(resolution*chunkGridSize, resolution * chunkGridSize);
+    chunks = [];
 
-    resolution = resolutionX;
+    let chunkScale = 2000;
 
-    heightMap = generateHeight(resolution, resolution);
+    for(i = -chunkGridSize/2 + .5; i < chunkGridSize/2; i++) {
+        for(j = -chunkGridSize/2 + .5; j < chunkGridSize/2; j++) {
+            chunkMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x111111,shininess: 2, vertexColors: THREE.VertexColors});
+            chunk = new THREE.MarchingCubes(resolution, chunkMaterial, false, true);
+            chunk.position.set( chunkScale * (i), 0, chunkScale * (j));
+            chunk.scale.set( chunkScale, chunkScale, chunkScale );
+            chunks.push(chunk);
+            scene.add(chunk);
+        }
+    }
 
-    cubesMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x111111,shininess: 10, vertexColors: THREE.VertexColors});
+    /*cubesMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x111111,shininess: 2, vertexColors: THREE.VertexColors});
     effect = new THREE.MarchingCubes(resolution, cubesMaterial, false, true);
     effect.position.set( 0, 0, 0);
     effect.scale.set( 2000, 2000, 2000 );
-    scene.add(effect);
+    scene.add(effect);*/
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.movementSpeed = 1000;
@@ -77,8 +74,10 @@ function main() {
 }
 
 var render = () => {
-    effect.init(resolution);
-    updateCubes( effect, false, false, false);
+    for(m = 0; m < chunks.length; m++) {
+        chunks[m].init(resolution);
+    }
+    updateCubes();
     //effect.material.uniforms[ "uBaseColor" ].value.setHSL( .5, 1, 0.025 );
     //effect.material.color.setHSL( .5, 1, 0.025  );
     renderer.render(scene,camera);
@@ -107,49 +106,84 @@ function generateHeight( width, height ) {
     return data;
 }
 
-function updateCubes( object,floor, wallx, wallz ) {
-    object.reset();
+function updateCubes() {
+    var waterHeight = 8;
+    //          sea level, water level, swamp level, plains level, peak level, sky
+    let heights = [0, 8, 10, 22, 28, resolution];
+    //bottom of ocean, top of water, top of swamp, top of 
+    let colors = [new THREE.Color(0,0,.1),new THREE.Color(0,0,.5),new THREE.Color(.2,.5,.1), new THREE.Color(.2,.5,.1), new THREE.Color(.7,.7,.7),
+        new THREE.Color(1,1,1) ];
 
-    var waterHeight = 13;
-    var terraceHeight = 2;
-    var peakHeight = 28;
+    heightColors = [];
+    for(y = 0; y < resolution; y++) {
+        heightColors.push(getInterpolatedColor(y,heights,colors));
+    }
 
-    let waterColor = new THREE.Color(0,0,.5);
-    //let groundColor = new THREE.Color(.2,.5,.1);
-    let groundColor = new THREE.Color(210/256, 133/256, 63/256)
-    let peakColor = new THREE.Color(.7,.7,.7);
-    
-    for(x = 0; x < resolution; x++) {
-        for(z = 0; z < resolution; z++) {
-            for(y = 0; y < waterHeight; y++) {
-                object.setCell(x,y,z,100);
-                var index = effect.size2 * z + effect.size * y + x;
-                effect.palette[ ( index ) * 3] += waterColor.r;
-				effect.palette[ ( index ) * 3 + 1 ] += waterColor.g;
-                effect.palette[ ( index ) * 3 + 2 ] += waterColor.b;
-            }
-            var height = heightMap[x*resolution + z]*.25;
-            //uncomment to make mountain into terrace
-            height -= height % terraceHeight
-            for(y = waterHeight; y < height; y++) {
-                object.setCell(x,y,z,100);
-                var index = effect.size2 * z + effect.size * y + x;
-                if(y > peakHeight) {
-                    effect.palette[ ( index ) * 3] += peakColor.r;
-				    effect.palette[ ( index ) * 3 + 1 ] += peakColor.g;
-				    effect.palette[ ( index ) * 3 + 2 ] += peakColor.b;
-                } else {
-                    effect.palette[ ( index ) * 3] += groundColor.r;
-				    effect.palette[ ( index ) * 3 + 1 ] += groundColor.g;
-                    effect.palette[ ( index ) * 3 + 2 ] += groundColor.b;
+    for(m = 0; m < chunks.length; m++) {
+        let chunk = chunks[m];
+        chunk.reset();
+        let chunkCoords = turnIndexToCoords(m, chunkGridSize);
+        for(x = 0; x < resolution; x++) {
+            for(z = 0; z < resolution; z++) {
+                for(y = 0; y < waterHeight; y++) {
+                    chunk.setCell(x,y,z,100);
+                    var index = getIndex(chunk,x,y,z);
+                    setColor(chunk, heightColors[y], index);
                 }
-            
+                let val = chunkCoords.z*resolution;
+                val += x;
+                val += resolution*chunkGridSize*z;
+                val += resolution*resolution*chunkGridSize*chunkCoords.x;
+
+                //let absoluteX = (x * resolution * chunkGridSize) + (chunkCoords[0] * resolution * resolution * chunkGridSize);
+                //let absoluteZ = z + (chunkCoords[1] * resolution);
+                var height = heightMap[val]*.25;
+                //uncomment to make mountain into terrace
+                //height -= height % terraceHeight
+                for(y = waterHeight; y < height; y++) {
+                    chunk.setCell(x,y,z,100);
+                    var index = getIndex(chunk,x,y,z);
+                    setColor(chunk, heightColors[y], index);
+                }
             }
         }
     }
-    
-    
-    if ( floor ) object.addPlaneY( 2, 12 );
-    if ( wallz ) object.addPlaneZ( 2, 12 );
-    if ( wallx ) object.addPlaneX( 2, 12 );
 }
+
+function turnCoordsToIndex(x,z,N) {
+    return x*N+z;
+}
+
+function turnIndexToCoords(m,N) {
+    let indexX = Math.floor(m/N);
+    let indexZ = m % N;
+    return {x: indexX, z:indexZ};
+}
+
+function getInterpolatedColor(y, heights, colors) {
+    //console.log("hi?");
+    var m = 0;
+    while(heights[m] <= y) {
+        m++;
+    }
+
+    return interpolateColors(colors[m-1], colors[m], y, heights[m-1], heights[m]);
+}
+
+function interpolateColors(colorOne, c2, val, lower, upper) {
+    var p = (val - lower)/(upper-lower); //1 is 100% upper, 0 is 0% upper and 100% lower
+    return new THREE.Color(p*c2.r + (1-p)*(colorOne.r),
+    p*c2.g + (1-p)*colorOne.g,
+    p*c2.b + (1-p)*colorOne.b);
+}
+
+function getIndex(object, x,y,z) {
+    return object.size2 * z + object.size * y + x;
+}
+
+function setColor(effect, color, index) {
+    effect.palette[ ( index ) * 3] = color.r;
+	effect.palette[ ( index ) * 3 + 1 ] = color.g;
+    effect.palette[ ( index ) * 3 + 2 ] = color.b;
+}
+
