@@ -78,7 +78,7 @@ var render = (delta) => {
         chunks[m].init(resolution);
     }
     timeElapsed += delta
-    if(timeElapsed > 3) {
+    if(timeElapsed > 7) {
         heightMap = generateHeight(resolution*chunkGridSize, resolution * chunkGridSize);
         timeElapsed = 0;
     }
