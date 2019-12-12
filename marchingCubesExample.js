@@ -1,39 +1,38 @@
-
 var scene;
 var camera;
-
 var renderer;
-
 var light;
 var pointLight;
 var ambientLight;
-
 var camera;
-
 var resolutionX;
 var resolutionY;
 var resolutionZ;
-
 var resolution;
-
 let heightMap;
-
 var cubesMaterial;
-
 var controls;
-
 var clock;
 
 function main() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-    renderer = new THREE.WebGLRenderer();
+    var ourCanvas = document.getElementById('theCanvas');
+    renderer = new THREE.WebGLRenderer({canvas: ourCanvas});
+    renderer.setClearColor(0x003333);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.gammaOutput = true;
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild(renderer.domElement);
+    
+
+    var geometry = new THREE.BoxGeometry(300,300,300);
+    var material = new THREE.MeshBasicMaterial({color:0x00ff00});
+    var cube = new THREE.Mesh(geometry, material);
+    cube.position.y = 150;
+    scene.add(cube);
 
     light = new THREE.DirectionalLight( 0xffffff );
     light.position.set( 0.5, 0.5, 1 );
@@ -45,7 +44,7 @@ function main() {
     scene.add( ambientLight );
 
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100000 );
-    camera.position.set( 3000, 4000, 3000 );
+    camera.position.set( 3000, 4000, -3000 );
     camera.lookAt(0,-1000,0);
 
     resolutionX = 100;
