@@ -34,8 +34,15 @@ function main() {
     cube.position.y = 150;
     scene.add(cube);
 
+    var geometry1 = new THREE.BoxGeometry(300,300,300);
+    var material1 = new THREE.MeshBasicMaterial({color:0x00ff00});
+    var cube1 = new THREE.Mesh(geometry, material);
+    cube1.position.y = 800;
+    scene.add(cube1);
+
     light = new THREE.DirectionalLight( 0xffffff );
     light.position.set( 0.5, 0.5, 1 );
+    light.position.normalize();
     scene.add( light );
     pointLight = new THREE.PointLight( 0xffffff );
     pointLight.position.set( 400, 500, 200 );
@@ -44,8 +51,8 @@ function main() {
     scene.add( ambientLight );
 
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100000 );
-    camera.position.set( 3000, 4000, -3000 );
-    camera.lookAt(0,-1000,0);
+    camera.position.set(1000,1000,1000 );
+    camera.lookAt(0,0,0);
 
     resolutionX = 100;
     resolutionY = 15;
@@ -57,7 +64,7 @@ function main() {
 
     cubesMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x111111,shininess: 10, vertexColors: THREE.VertexColors});
     effect = new THREE.MarchingCubes(resolution, cubesMaterial, true, true);
-    effect.position.set( 0, 0, 0 );
+    effect.position.set( 0, 0, 0);
     effect.scale.set( 2000, 2000, 2000 );
     scene.add(effect);
 
@@ -71,7 +78,7 @@ function main() {
 
 var render = () => {
     effect.init(resolution);
-    updateCubes( effect, false, false, false);
+    updateCubes( effect, true, false, false);
     //effect.material.uniforms[ "uBaseColor" ].value.setHSL( .5, 1, 0.025 );
     //effect.material.color.setHSL( .5, 1, 0.025  );
     renderer.render(scene,camera);
@@ -140,6 +147,7 @@ function updateCubes( object,floor, wallx, wallz ) {
             }
         }
     }
+    
     
     if ( floor ) object.addPlaneY( 2, 12 );
     if ( wallz ) object.addPlaneZ( 2, 12 );
