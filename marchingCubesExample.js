@@ -78,9 +78,9 @@ var render = () => {
 };
 
 var loop = () => {
-    requestAnimationFrame(loop);
     controls.update();
     render();
+    requestAnimationFrame(loop);
 };
 
 //https://github.com/mrdoob/three.js/blob/master/examples/webgl_geometry_terrain.html
