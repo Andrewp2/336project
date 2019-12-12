@@ -21,6 +21,7 @@
 	<script src="dat.gui.min.js"></script>
 	<script src="OrbitControls.js"></script>
 	<script src="MarchingCubes.js"></script>
+	<script src="ImprovedNoise.js"></script>
 	<script>
 
 		var container, stats;
@@ -36,6 +37,8 @@
 		var effectController;
 
 		var time = 0;
+
+		var heightMap;
 		var clock = new THREE.Clock();
 
 		init();
@@ -53,7 +56,7 @@
 			// SCENE
 
 			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x050505 );
+			scene.background = new THREE.Color( 0x222222 );
 
 			// LIGHTS
 
@@ -65,18 +68,30 @@
 			pointLight.position.set( 0, 0, 100 );
 			scene.add( pointLight );
 
+			var geometry = new THREE.BoxGeometry(50,50,50);
+			var material = new THREE.MeshBasicMaterial({color:0x00ff00});
+			var cube = new THREE.Mesh(geometry, material);
+			cube.position.y = 150;
+			scene.add(cube);
+
+			var geometry1 = new THREE.BoxGeometry(50,50,50);
+			var material1 = new THREE.MeshBasicMaterial({color:0x00ff00});
+			var cube1 = new THREE.Mesh(geometry1, material1);
+			cube1.position.y = 400;
+			scene.add(cube1);
+
 			ambientLight = new THREE.AmbientLight( 0x080808 );
 			scene.add( ambientLight );
 
 			// MATERIALS
 
 			materials = generateMaterials();
-			current_material = "shiny";
+			current_material = "chrome";
 
 			// MARCHING CUBES
 
-			resolution = 28;
-
+			resolution = 100;
+			heightMap = generateHeight(resolution, resolution);
 			effect = new THREE.MarchingCubes( resolution, materials[ current_material ].m, true, true );
 			effect.position.set( 0, 0, 0 );
 			effect.scale.set( 700, 700, 700 );
@@ -128,6 +143,23 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
+
+		//https://github.com/mrdoob/three.js/blob/master/examples/webgl_geometry_terrain.html
+		function generateHeight( width, height ) {
+			var size = width * height;
+			data = new Uint8Array( size );
+			perlin = new THREE.ImprovedNoise();
+			quality = 1;
+			z = Math.random() * 100;
+			for ( var j = 0; j < 4; j ++ ) {
+				for ( var i = 0; i < size; i ++ ) {
+					var x = i % width, y = ~ ~ ( i / width );
+					data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
+				}
+				quality *= 5;
+			}
+			return data;
+}
 
 		function generateMaterials() {
 
@@ -233,11 +265,11 @@
 
 			effectController = {
 
-				material: "shiny",
+				material: "chrome",
 
 				speed: 1.0,
-				numBlobs: 10,
-				resolution: 28,
+				numBlobs: 0,
+				resolution: 100,
 				isolation: 80,
 
 				floor: true,
@@ -353,6 +385,45 @@
 
 			}
 
+			var waterHeight = 0;
+			var terraceHeight = 2;
+			var peakHeight = 28;
+
+			let waterColor = new THREE.Color(0,0,.5);
+			//let groundColor = new THREE.Color(.2,.5,.1);
+			let groundColor = new THREE.Color(210/256, 133/256, 63/256)
+			let peakColor = new THREE.Color(.7,.7,.7);
+			
+			for(x = 0; x < resolution; x++) {
+				for(z = 0; z < resolution; z++) {
+					for(y = 0; y < waterHeight; y++) {
+						object.setCell(x,y,z,100);
+						var index = effect.size2 * z + effect.size * y + x;
+						effect.palette[ ( index ) * 3] += waterColor.r;
+						effect.palette[ ( index ) * 3 + 1 ] += waterColor.g;
+						effect.palette[ ( index ) * 3 + 2 ] += waterColor.b;
+					}
+					var height = heightMap[x*resolution + z]*.25;
+					//console.log(height);
+					//uncomment to make mountain into terrace
+					//height -= height % terraceHeight
+					for(y = waterHeight; y < height; y++) {
+						object.setCell(x,y,z,100);
+						var index = effect.size2 * z + effect.size * y + x;
+						if(y > peakHeight) {
+							effect.palette[ ( index ) * 3] += peakColor.r;
+							effect.palette[ ( index ) * 3 + 1 ] += peakColor.g;
+							effect.palette[ ( index ) * 3 + 2 ] += peakColor.b;
+						} else {
+							effect.palette[ ( index ) * 3] += groundColor.r;
+							effect.palette[ ( index ) * 3 + 1 ] += groundColor.g;
+							effect.palette[ ( index ) * 3 + 2 ] += groundColor.b;
+						}
+					
+					}
+				}
+			}
+
 			if ( floor ) object.addPlaneY( 2, 12 );
 			if ( wallz ) object.addPlaneZ( 2, 12 );
 			if ( wallx ) object.addPlaneX( 2, 12 );
@@ -391,13 +462,15 @@
 
 			}
 
-			updateCubes( effect, time, effectController.numBlobs, effectController.floor, effectController.wallx, effectController.wallz );
+			updateCubes( effect, time, effectController.numBlobs, effectController.floor, 
+			effectController.wallx, effectController.wallz );
 
 			// materials
 
 			if ( effect.material instanceof THREE.ShaderMaterial ) {
 
-				effect.material.uniforms[ "uBaseColor" ].value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
+				effect.material.uniforms[ "uBaseColor" ].value.setHSL( effectController.hue, 
+				effectController.saturation, effectController.lightness );
 
 			} else {
 
