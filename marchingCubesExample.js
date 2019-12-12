@@ -10,7 +10,7 @@ var cubesMaterial;
 var controls;
 var clock;
 
-let chunkGridSize = 3;
+let chunkGridSize = 4;
 let chunkGridSize2 = chunkGridSize * chunkGridSize;
 let resolution = 50;
 
@@ -40,7 +40,7 @@ function main() {
     scene.add( ambientLight );
 
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100000 );
-    camera.position.set(2000,4000,2000 );
+    camera.position.set(2000,2000 * chunkGridSize,2000 );
     camera.lookAt(0,0,0);
 
     heightMap = generateHeight(resolution*chunkGridSize, resolution * chunkGridSize);
@@ -64,16 +64,23 @@ function main() {
     //scene.add(cube);
 
     controls = new THREE.FirstPersonControls(camera, renderer.domElement);
-    controls.movementSpeed = 1000;
-    controls.lookSpeed = 0.1;
+    controls.movementSpeed = 5000;
+    controls.lookSpeed = 0.003;
 
     clock = new THREE.Clock();
     loop();
 }
 
-var render = () => {
+var timeElapsed = 0;
+
+var render = (delta) => {
     for(m = 0; m < chunks.length; m++) {
         chunks[m].init(resolution);
+    }
+    timeElapsed += delta
+    if(timeElapsed > 3) {
+        heightMap = generateHeight(resolution*chunkGridSize, resolution * chunkGridSize);
+        timeElapsed = 0;
     }
     updateCubes();
     //effect.material.uniforms[ "uBaseColor" ].value.setHSL( .5, 1, 0.025 );
@@ -82,8 +89,9 @@ var render = () => {
 };
 
 var loop = () => {
-    controls.update(clock.getDelta());
-    render();
+    var delta = clock.getDelta();
+    controls.update(delta);
+    render(delta);
     requestAnimationFrame(loop);
 };
 
