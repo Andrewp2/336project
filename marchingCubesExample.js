@@ -36,7 +36,7 @@ function main() {
 
     var geometry1 = new THREE.BoxGeometry(300,300,300);
     var material1 = new THREE.MeshBasicMaterial({color:0x00ff00});
-    var cube1 = new THREE.Mesh(geometry, material);
+    var cube1 = new THREE.Mesh(geometry1, material1);
     cube1.position.y = 800;
     scene.add(cube1);
 
@@ -51,7 +51,7 @@ function main() {
     scene.add( ambientLight );
 
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100000 );
-    camera.position.set(1000,1000,1000 );
+    camera.position.set(4000,4000,4000 );
     camera.lookAt(0,0,0);
 
     resolutionX = 100;
@@ -78,7 +78,7 @@ function main() {
 
 var render = () => {
     effect.init(resolution);
-    updateCubes( effect, true, false, false);
+    updateCubes( effect, false, false, false);
     //effect.material.uniforms[ "uBaseColor" ].value.setHSL( .5, 1, 0.025 );
     //effect.material.color.setHSL( .5, 1, 0.025  );
     renderer.render(scene,camera);
