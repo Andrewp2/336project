@@ -87,19 +87,9 @@ function main() {
   loop();
 }
 
-var timeElapsed = 0;
-
 var render = delta => {
   for (m = 0; m < chunks.length; m++) {
     chunks[m].init(resolution);
-  }
-  timeElapsed += delta;
-  if (timeElapsed > 7) {
-    heightMap = generateHeight(
-      resolution * chunkGridSize,
-      resolution * chunkGridSize
-    );
-    timeElapsed = 0;
   }
   updateCubes();
   renderer.render(scene, camera);
