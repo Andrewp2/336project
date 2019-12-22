@@ -124,7 +124,7 @@ function generateHeight(width, height) {
 
 function updateCubes() {
   var waterHeight = 8;
-  //          sea level, water level, swamp level, plains level, peak level, sky
+  //sea level, water level, swamp level, plains level, peak level, sky
   let heights = [
     0,
     resolution * (8 / 50),
@@ -150,6 +150,8 @@ function updateCubes() {
     heightColors.push(getInterpolatedColor(y, heights, colors));
   }
 
+  let terraceHeight = 2;
+
   for (m = 0; m < chunks.length; m++) {
     let chunk = chunks[m];
     chunk.reset();
@@ -170,7 +172,7 @@ function updateCubes() {
         //let absoluteZ = z + (chunkCoords[1] * resolution);
         var height = heightMap[val] * 0.25;
         //uncomment to make mountain into terrace
-        //height -= height % terraceHeight
+        height -= height % terraceHeight
         for (y = waterHeight; y < height; y++) {
           chunk.setCell(x, y, z, 100);
           var index = getIndex(chunk, x, y, z);
@@ -192,7 +194,6 @@ function turnIndexToCoords(m, N) {
 }
 
 function getInterpolatedColor(y, heights, colors) {
-  //console.log("hi?");
   var m = 0;
   while (heights[m] <= y) {
     m++;
